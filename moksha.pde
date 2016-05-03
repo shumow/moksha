@@ -1,8 +1,9 @@
 
 //***************************************************************
-//falling leaves app
+//moksha app
+// fork of falling leaves app
 //***************************************************************
-final boolean DEBUG_MODE = false;
+final boolean DEBUG_MODE = true;
 static boolean display_tree = true;
 static PImage imgTree = null;
 static PImage imgSilhouette = null; 
