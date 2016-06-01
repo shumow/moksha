@@ -62,10 +62,11 @@ class GridTiler implements XMLLoadable
   //***************************************************************
   private void populateNearbyTiles()
   {
-    int[] dims = {-12,12};
-    for(int i = dims[0]; i < dims[1]; i++)
+    int[] xdims = {-25,25};
+    int[] ydims = {-12,12};
+    for(int i = xdims[0]; i < xdims[1]; i++)
     {
-      for(int j = dims[0]; j < dims[1]; j++)
+      for(int j = ydims[0]; j < ydims[1]; j++)
       {
         boolean occupied = isTileOccupied(i,j,3,3);
         if(!occupied)
