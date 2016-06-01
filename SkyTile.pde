@@ -9,6 +9,12 @@ class SkyTile extends ProceduralAnimatedGridTile
   
   int upx;
   int upy;
+
+  void setTileColor()
+  {
+    tileColor = color(135,206,235);
+  }
+
   
   //***************************************************************
   //origin construtor
@@ -16,7 +22,7 @@ class SkyTile extends ProceduralAnimatedGridTile
   public SkyTile(int x, int y)
   {
     super(x,y);
-    tileColor = color(0,0,255);
+    setTileColor();
   }
   
   //***************************************************************
@@ -25,7 +31,7 @@ class SkyTile extends ProceduralAnimatedGridTile
   public SkyTile(XML xml)
   {
     super(xml);
-    tileColor = color(0,0,255);
+    setTileColor();
   }
   
   //***************************************************************

@@ -31,7 +31,7 @@ RadialTileChanger tileChanger;
 
 void CreateLeafSystem()
 {
-  leafs = new LeafSystem(50, "leafSystem.png", 75);
+  leafs = new LeafSystem(50, "leafSystem.png", 750);
   leafs.spawn();
 }
 
@@ -83,7 +83,7 @@ void drawTree()
   
   dg.pushStyle();
     dg.imageMode(CORNER);
-    dg.image(imgTree, 0, 0);
+    dg.image(imgTree, 0, 0,width,height);
   dg.popStyle();  
   dg.popMatrix();
 }
@@ -99,10 +99,10 @@ void drawSilhouette()
   }
   dg.rotate(-PI/2);
   
-  dg.pushStyle();
-  dg.imageMode(CORNER);
-  dg.image(imgSilhouette, 0, 0,width,height);
-  dg.popStyle();  
+    dg.pushStyle();
+      dg.imageMode(CORNER);
+      dg.image(imgSilhouette, 0, 0,width,height);
+    dg.popStyle();  
   dg.popMatrix();
 }
 
