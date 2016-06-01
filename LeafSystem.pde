@@ -5,6 +5,10 @@ static final float[] rotationDirections = {-1,1};
 
 static final float leaf_img_sz = 50.0;
 
+static final int min_leaf_spawn_pts = 200;
+
+static final boolean leafs_fall = false;
+
 class LeafSystem {
 
   class Point {    
@@ -37,49 +41,43 @@ class LeafSystem {
 
     float leaf_bound;
 
-
     color randLeafColor() {
-      float r,g;
-      if (1 < random(4)) {
-        r = random(128, 255);
-        g = random(r-128);
-      } else {
-        r = 128 + random(128);
-        g = 128 + random(r - 128);
-      }
-      return color(r,g,0);
+      return color(random(128),random(224,256),random(96));
     }    
+
     Leaf(Point ipt, PImage iimg) {
       pt = ipt;
       img = iimg;
       falling = false;
       offScreen = false;
       
-      if (DEBUG_MODE) {
+      if (!ROTATE_DISPLAY) {
         leaf_bound = height;
       } else {
         leaf_bound = width;
       }
       
-      rad = random(-PI, PI);  // this should be where the position gets set.
+      rad = random(QUARTER_PI, 5*QUARTER_PI);  // this should be where the position gets set.
       rotateDir = rotationDirections[int(random(2))];
       c = randLeafColor();
     }
     
     void draw() {
-      pushMatrix();
-        pushStyle();
-          translate(pt.x, pt.y);
-          tint(c);
-          rotate(rad);
-          image(img, 0, 0, leaf_img_sz, leaf_img_sz);
-        popStyle();
-      popMatrix();
+      dg.pushMatrix();
+        dg.pushStyle();
+          dg.translate(pt.x, pt.y);
+          dg.tint(c);
+          dg.rotate(rad);
+          dg.image(img, 0, 0, leaf_img_sz, leaf_img_sz);
+        dg.popStyle();
+      dg.popMatrix();
       
     }
     
     void update(float dt) {
-      
+      if (!leafs_fall) {
+        return;
+      }
       if (falling) {
         pt.y += dt*(800.0/fullScreenFallTime);
         rad += dt*rotateDir*rotationalVelocity;
@@ -95,7 +93,6 @@ class LeafSystem {
           rotationalVelocity = maxRotationalVelocity*random(.2,1);
         }
       }
-      
     }
   }
   
@@ -111,15 +108,18 @@ class LeafSystem {
   float radius;
 
   String fileName;
+  
+  boolean spawn_leaves;
 
   void drawBackgroundImg() {
     pg.pushMatrix();
-    if(DEBUG_MODE)
+    
+    if(!ROTATE_DISPLAY)
     { 
       pg.translate(0,width);
       pg.rotate(-PI/2);
     } 
-    
+   
     pg.background(img); 
     pg.popMatrix();
   }
@@ -131,8 +131,7 @@ class LeafSystem {
 
     fileName = dataPath(FileName);
     loadLeafSystemFile();
-    
-    pg = createGraphics(600, 800);
+    pg = createGraphics(screenWidth, screenHeight);
     pg.beginDraw();
     if (null == img) {
       pg.background(color(0),0);
@@ -152,18 +151,22 @@ class LeafSystem {
   // black and clear...
   void ingestLeafData() {
     img.loadPixels();
-    for (int y = 0; y < img.width; y++) {
-      for (int x = 0; x < img.height; x++) {
-        if (0 != img.pixels[y *img.width + x]) {
+    for (int x = 0; x < img.width; x++) {
+      for (int y = 0; y < img.height; y++) {
+        if (0 != img.get(x,y)) {
           //println("adding spawnpoint " + i + "," + j);
           leafSpawnPts.add(new Point(x, y)); // I don't know why these are reveresed...
         }
       }
     }
-    if (0 == leafSpawnPts.size()) {
-      leafSpawnPts.add(new Point(width, height));
-    }
     println(this.getClass() + ": Number of ingested leaf spawn points " + leafSpawnPts.size());
+
+    if (0 == leafSpawnPts.size()) {
+      println(this.getClass() + ": No leaf spawn points, not spawning leaves.");
+      spawn_leaves = false;
+    } else {
+      spawn_leaves = true;
+    }
   }
   
   // load leaf file from disk and ingest it.
@@ -193,11 +196,12 @@ class LeafSystem {
   }
 
   void loadLeafImages() {
-    leafImages = new PImage[4];
+    leafImages = new PImage[5];
     leafImages[0] = loadCachedPNGFile("leaf1.png");
     leafImages[1] = loadCachedPNGFile("leaf2.png");
     leafImages[2] = loadCachedPNGFile("leaf3.png");
     leafImages[3] = loadCachedPNGFile("leaf4.png");
+    leafImages[4] = loadCachedPNGFile("leaf5.png");
   }
 
   // draws an ellipse at x,y with radius 'radius'
@@ -225,7 +229,7 @@ class LeafSystem {
   
   void displaySpawnData(){
     pushMatrix();
-      if (!DEBUG_MODE) {
+      if (ROTATE_DISPLAY) {
         translate(0,height);
         rotate(-PI/2);
       }
@@ -239,16 +243,22 @@ class LeafSystem {
   }
   
   Leaf spawnLeaf() {
+    if (!spawn_leaves)
+    {
+      return null;
+    }
     Point p = getRandomSpawnPoint();
     PImage leafImg = leafImages[int(random(leafImages.length))];
     Leaf newLeaf = new Leaf(p, leafImg);
     
     return newLeaf;
-    
   }
   
   void spawn() {
-    
+    if (!spawn_leaves)
+    {
+      return;
+    }
     if(leafSpawnPts == null || leafSpawnPts.size() <1)
     {
       println(this.getClass() + " we got a damn problem.");
@@ -261,30 +271,39 @@ class LeafSystem {
   
   //render the leaf system
   void draw() {
-    pushMatrix();
+    if (!spawn_leaves)
+    {
+      return;
+    }
+    dg.pushMatrix();
 
-    if (!DEBUG_MODE) {
-      translate(0,height);
-      rotate(-PI/2);
+    if (ROTATE_DISPLAY) {
+      dg.translate(0,height);
+      dg.rotate(-PI/2);
     }
     
     try{
       //println("drawing leaves.");
-      imageMode(CENTER);
+      dg.imageMode(CENTER);
       for (Leaf l : leaves) {
         l.draw();
       }
-      imageMode(CORNER);
+      dg.imageMode(CORNER);
     }
     catch(Exception e)
     {
-//      println(this.getClass() + ":draw: " + e);
+      println(this.getClass() + ":draw: " + e);
     }
-    popMatrix();
+    dg.popMatrix();
   }
   
   
   void update(float dt) {
+    if (!spawn_leaves ||
+        !leafs_fall)
+    {
+      return;
+    }
     for (int i=0; i < leaves.length; i++) {
       leaves[i].update(dt);
       if (leaves[i].offScreen) {

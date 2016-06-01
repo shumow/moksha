@@ -1,23 +1,31 @@
-//***************************************************************
-// kewl computer graphics!
-//***************************************************************
-class ProceduralAnimatedGridTile extends AnimatedGridTile
+class SkyTile extends ProceduralAnimatedGridTile
 {
-    int tileColor = 0;
+  int tileColor = 0;
+  
+  boolean is_right = false;
+  boolean is_left = false;
+  boolean is_top = false;
+  boolean is_cloudlayer = false;
+  
+  int upx;
+  int upy;
+  
   //***************************************************************
   //origin construtor
   //***************************************************************
-  public ProceduralAnimatedGridTile(int x, int y)
+  public SkyTile(int x, int y)
   {
     super(x,y);
+    tileColor = color(0,0,255);
   }
   
   //***************************************************************
   // XML constructor
   //***************************************************************
-  public ProceduralAnimatedGridTile(XML xml)
+  public SkyTile(XML xml)
   {
     super(xml);
+    tileColor = color(0,0,255);
   }
   
   //***************************************************************
@@ -25,10 +33,17 @@ class ProceduralAnimatedGridTile extends AnimatedGridTile
   //***************************************************************
   public void draw()
   {
+    float[][] bases = gridTiles.getBasisVectors();
     dg.pushStyle();
-    //fill me in
+    dg.noStroke();
     dg.fill(tileColor);
-    dg.rect(0,0,40,40);
+    dg.beginShape(TRIANGLE_STRIP);
+      dg.vertex(0, 0);
+      dg.vertex(bases[0][0], bases[0][1]);
+      dg.vertex(bases[1][0], bases[1][1]);
+      dg.vertex(bases[0][0] + bases[1][0], bases[0][1] + bases[1][1]); 
+    dg.endShape();
+
     dg.popStyle();
   }
   
@@ -37,18 +52,39 @@ class ProceduralAnimatedGridTile extends AnimatedGridTile
   //***************************************************************
   public void update(float dt)
   {
-    //fill me in
-    tileColor = color(255*(1+sin(millis()/1000.f))/2,
-                      255*(1+sin(20+millis()/900.f))/2,
-                      255*(1+sin(3+millis()/222.f))/2);
+
   }
   
   //***************************************************************
   // load with XML
   //***************************************************************
   void loadWithXML(XML xml)
-  {
+  {    
     super.loadWithXML(xml);
     println("XML: Initializing " + this.getClass().getName());
+ 
+    if (xml.hasAttribute("isright"))
+    {
+      is_right = true;
+    }
+    
+    if (xml.hasAttribute("isleft"))
+    {
+      is_left = true;
+    }
+    
+    if (xml.hasAttribute("isTop"))
+    {
+      is_top = true;
+    }
+    
+    boolean has_upx;
+    boolean has_upy;
+
+    has_upx = xml.hasAttribute("upx");
+    has_upy = xml.hasAttribute("upy");
+
+    // if we only have one of these there's an error
+    //if (has_upx ^ has_upy)    
   }
 }

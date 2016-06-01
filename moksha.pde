@@ -1,14 +1,18 @@
-
 //***************************************************************
 //moksha app
 // fork of falling leaves app
 //***************************************************************
 final boolean DEBUG_MODE = true;
-static boolean display_tree = true;
+final boolean ROTATE_DISPLAY = false;
+final boolean HALVE_DISPLAY = false;
+static boolean display_tree = false;
+static boolean display_silhouette = true;
 static PImage imgTree = null;
 static PImage imgSilhouette = null; 
 static GridTiler gridTiles;
 float lastEndTick = 0;
+
+static PGraphics dg;
 
 static boolean edit_mode = false;
 static boolean display_leaf_system = false;
@@ -18,23 +22,36 @@ static boolean draw_crop_line = false;
 
 static float cropX;
 
+static int screenWidth = 960;
+static int screenHeight = 540;
+
 static LeafSystem leafs;
 
 RadialTileChanger tileChanger;
+
+void CreateLeafSystem()
+{
+  leafs = new LeafSystem(50, "leafSystem.png", 75);
+  leafs.spawn();
+}
 
 //FluidMotionReceiver fmr;
 //***************************************************************
 // called to set everything up
 //***************************************************************
 void setup()
-{
-  if(DEBUG_MODE)
-  { size(600,800,P2D); }
-  else
-  { size(800,600,P2D); }//we are dealing with a 800x600 native res projector
-  if (!DEBUG_MODE) {
-    noCursor();
+{  
+  if (!ROTATE_DISPLAY)
+  {
+    size(screenWidth,screenHeight,P2D); //we are dealing with a WUXGA projector which can support 1080p natively    
   }
+  else
+  {
+    size(screenHeight,screenWidth,P2D);
+  }
+
+  dg = g;
+  
   XML xml = loadXML("GridTiler.xml");
   if(DEBUG_MODE)
   { gridTiles = new GridTool(xml);}//new float[]{width/2,height/2},50, PI/3, 2*PI/3.f);
@@ -44,8 +61,7 @@ void setup()
   gridTiles.loadWithXML(xml);
   
   tileChanger = new RadialTileChanger(gridTiles,new float[]{0,0});
-  leafs = new LeafSystem(50, "leafSystem.png", 75);
-  leafs.spawn();
+  CreateLeafSystem();
   
   imgTree = loadImage("treeoverlay.png");
   imgSilhouette = loadImage("treesilhouette.png");
@@ -56,38 +72,38 @@ void setup()
 
 void drawTree()
 {
-  pushMatrix();
-  if(DEBUG_MODE)
+  dg.pushMatrix();
+  if(!ROTATE_DISPLAY)
   { 
-    translate(0,width);
+    dg.translate(0,width);
   } else { 
-    translate(0,height);
+    dg.translate(0,height);
   }
-  rotate(-PI/2);
+  dg.rotate(-PI/2);
   
-  pushStyle();
-  imageMode(CORNER);
-  image(imgTree, 0, 0);
-  popStyle();  
-  popMatrix();
+  dg.pushStyle();
+    dg.imageMode(CORNER);
+    dg.image(imgTree, 0, 0);
+  dg.popStyle();  
+  dg.popMatrix();
 }
 
 void drawSilhouette()
 {
-  pushMatrix();
-  if(DEBUG_MODE)
+  dg.pushMatrix();
+  if(!ROTATE_DISPLAY)
   { 
-    translate(0,width);
+    dg.translate(0,width);
   } else { 
-    translate(0,height);
+    dg.translate(0,height);
   }
-  rotate(-PI/2);
+  dg.rotate(-PI/2);
   
-  pushStyle();
-  imageMode(CORNER);
-  image(imgSilhouette, 0, 0);
-  popStyle();  
-  popMatrix();
+  dg.pushStyle();
+  dg.imageMode(CORNER);
+  dg.image(imgSilhouette, 0, 0,width,height);
+  dg.popStyle();  
+  dg.popMatrix();
 }
 
 
@@ -97,36 +113,37 @@ void drawSilhouette()
 //***************************************************************
 void draw()
 {
-  pushStyle();
-  fill(0,0,0,90);
-  rect(0,0,width,height);
-  popStyle();
+  //dg.beginDraw();
+  dg.pushStyle();
+  dg.fill(0,0,0,90);
+  dg.rect(0,0,width,height);
+  dg.popStyle();
   
-  if(DEBUG_MODE)
+  if(!ROTATE_DISPLAY)
   { 
-    pushMatrix();
-    translate(width,0);
-    rotate(PI/2);
+    dg.pushMatrix();
+    dg.translate(width,0);
+    dg.rotate(PI/2);
   }
 
   float secondsSinceLastUpdate = (millis()-lastEndTick)/1000.f;
   gridTiles.update(secondsSinceLastUpdate);
   leafs.update(secondsSinceLastUpdate);
-//  if(!tileChanger.isComplete())
-    tileChanger.update(secondsSinceLastUpdate);
-//  else
-//    tileChanger.reset();
+  tileChanger.update(secondsSinceLastUpdate);
   gridTiles.draw();
   lastEndTick = millis();
   
   if (display_tree) {
     drawTree();
   } else {
-    drawSilhouette(); 
+    if (display_silhouette)
+    {
+      drawSilhouette();
+    }
   }
 
-  if (DEBUG_MODE) {
-    popMatrix();
+  if (!ROTATE_DISPLAY) {
+    dg.popMatrix();
   }
     
   if (edit_mode || display_leaf_system) {
@@ -138,11 +155,15 @@ void draw()
   }
   
   if (crop_line || draw_crop_line) {
-    pushStyle();
-    stroke(255,0,0);
-    line(cropX,0,cropX,height);
-    popStyle();
+    dg.pushStyle();
+      dg.stroke(255,0,0);
+      dg.line(cropX,0,cropX,height);
+    dg.popStyle();
   }
+  
+  //dg.endDraw();
+  //clear();
+  //image(dg,0,0,width,height);
 }
 
 //***************************************************************
@@ -179,7 +200,7 @@ void mouseMoved() {
 
 void saveScreenToPicture()
 {
-  save("screenCap/fallingLeaves-"+year()+"-"+month()+"-"+day()+":"+hour()+":"+minute()+":"+second()+":"+millis() +".png");
+  dg.save("screenCap/fallingLeaves-"+year()+"-"+month()+"-"+day()+":"+hour()+":"+minute()+":"+second()+":"+millis() +".png");
 }
 
 
@@ -199,9 +220,13 @@ void keyPressed()
   if (ifKeyPair(key,'t','T')) {
     display_tree ^= true;
   }
+  if (ifKeyPair(key,'s','S')) {
+    display_silhouette ^= true;
+  }
   if (ifKeyPair(key,'e','E')) {
     if (edit_mode) {
       leafs.finishSpawnMask();
+      CreateLeafSystem();
       display_leaf_system = true;
     }
     edit_mode ^= true;

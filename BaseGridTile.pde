@@ -8,7 +8,7 @@ class BaseGridTile implements XMLLoadable
   int[] size = {1,1};
   
   int tintColor = color(255);
-    float colorShiftOffset[]= new float[]{random(TWO_PI),random(TWO_PI)};;
+  float colorShiftOffset[]= new float[]{random(TWO_PI),random(TWO_PI)};;
   float colorShiftSpd[] =new float[]{ random(.1), random(.1)};
     
   private ArrayList<BaseGridTile> subTiles = new ArrayList<BaseGridTile>();
@@ -70,9 +70,9 @@ class BaseGridTile implements XMLLoadable
   //***************************************************************
   public void draw()
   {
-    pushStyle();
+    dg.pushStyle();
     
-    popStyle();
+    dg.popStyle();
   }
   
   //***************************************************************

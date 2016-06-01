@@ -9,16 +9,16 @@ class GridTiler implements XMLLoadable
 {
 
   
-  protected float[] xAxis = {20,5};
-  protected float[] yAxis = {5,20};
+  protected float[] xAxis = {39,25};
+  protected float[] yAxis = {25,39};
   protected float[] origin = {0,0};
   
   ArrayList<BaseGridTile> xmlTiles = new ArrayList<BaseGridTile>();
-    ArrayList<BaseGridTile> genTiles = new ArrayList<BaseGridTile>();
+  ArrayList<BaseGridTile> genTiles = new ArrayList<BaseGridTile>();
   //  table of tiles that come from xml
-//  Hashtable<pos,BaseGridTile> xmlTiles = new Hashtable<pos,BaseGridTile>();
+  //  Hashtable<pos,BaseGridTile> xmlTiles = new Hashtable<pos,BaseGridTile>();
   //table of tile that we generate ourselves
-//  Hashtable<pos,BaseGridTile> genTiles = new Hashtable<pos,BaseGridTile>();
+  //  Hashtable<pos,BaseGridTile> genTiles = new Hashtable<pos,BaseGridTile>();
   //***************************************************************
   // xml - xml object containing serialized object
   //***************************************************************
@@ -98,20 +98,137 @@ class GridTiler implements XMLLoadable
   {
     
     BaseGridTile tile = null;
-    if(w==3 && h ==3)
-    {
     
+    if (w==4 && h==4)
+    {
       if(random(1) > .5)
       {
-        String[] names = {"terrain_block1-3x3.png","terrain_wave1-3x3.png","terrain_star1-3x3.png","leaves3x3-0x75.png","bldg3x3-0x75.png","leafs3x3-0x75.png","sand3x3-0x75.png"};
+        String[] names = {"arrays4x4-0x0.png", "flowers4x4-0x0.png", "InterlockingCircles4x4-0x0.png"};
         int rndIndex = (int)(random(names.length));
-        tile = new PNGGridTile(new int[]{x,y}, new int[]{3,3}, new float[]{0,75},names[rndIndex] );
+        tile = new PNGGridTile(new int[]{x,y}, new int[]{4,4}, new float[]{0,0},names[rndIndex] );
       }
       else
       {
-        
+        tile = new StaticProceduralTile(x,y,4,4);
+      }      
+    }
+    else if(w==4 && h==3)
+    {
+      if(random(1) > .5)
+      {
+        String[] names = {"InterlockingCircles4x3-0x0.png"};
+        int rndIndex = (int)(random(names.length));
+        tile = new PNGGridTile(new int[]{x,y}, new int[]{4,3}, new float[]{0,0},names[rndIndex] );
+      }
+      else
+      {
+        tile = new StaticProceduralTile(x,y,4,3);
+      }
+    }
+    else if(w==4 && h==2)
+    {
+      if(random(1) > .5)
+      {
+        String[] names = {"InterlockingCircles4x2-0x0.png"};
+        int rndIndex = (int)(random(names.length));
+        tile = new PNGGridTile(new int[]{x,y}, new int[]{4,2}, new float[]{0,0},names[rndIndex] );
+      }
+      else
+      {
+        tile = new StaticProceduralTile(x,y,4,2);
+      }
+    }
+    else if(w==4 && h==1)
+    {
+      if(random(1) > .5)
+      {
+        String[] names = {"InterlockingCircles4x1-0x0.png"};
+        int rndIndex = (int)(random(names.length));
+        tile = new PNGGridTile(new int[]{x,y}, new int[]{4,1}, new float[]{0,0},names[rndIndex] );
+      }
+      else
+      {
+        tile = new StaticProceduralTile(x,y,4,1);
+      }
+    }
+    else if(w==3 && h==4)
+    {
+      if(random(1) > .5)
+      {
+        String[] names = {"LeftBigFan3x4-0x0.png"};
+        int rndIndex = (int)(random(names.length));
+        tile = new PNGGridTile(new int[]{x,y}, new int[]{3,4}, new float[]{0,0},names[rndIndex] );
+      }
+      else
+      {
+        tile = new StaticProceduralTile(x,y,3,4);
+      }
+    }
+    else if(w==3 && h==3)
+    {
+      if(random(1) > .5)
+      {
+        String[] names = {"arrays3x3-0x0.png", "flowers3x3-0x0.png", "InterlockingCircles3x3-0x0.png"};
+        int rndIndex = (int)(random(names.length));
+        tile = new PNGGridTile(new int[]{x,y}, new int[]{3,3}, new float[]{0,0},names[rndIndex] );
+      }
+      else
+      {
         tile = new StaticProceduralTile(x,y,3,3);
       }
+    }
+    else if(w==3 && h==2)
+    {
+      if(random(1) > .5)
+      {
+        String[] names = {"InterlockingCircles3x2-0x0.png"};
+        int rndIndex = (int)(random(names.length));
+        tile = new PNGGridTile(new int[]{x,y}, new int[]{3,2}, new float[]{0,0},names[rndIndex] );
+      }
+      else
+      {
+        tile = new StaticProceduralTile(x,y,3,2);
+      }
+    }
+    else if(w==3 && h==1)
+    {
+      if(random(1) > .5)
+      {
+        String[] names = {"BowtieTesselation3x1-0x0.png"};
+        int rndIndex = (int)(random(names.length));
+        tile = new PNGGridTile(new int[]{x,y}, new int[]{3,1}, new float[]{0,0},names[rndIndex] );
+      }
+      else
+      {
+        tile = new StaticProceduralTile(x,y,3,1);
+      }
+    }
+    else if(w==2 && h ==4)
+    {
+        if(random(1) > .5)
+        {
+          tile = new StaticProceduralTile(x,y,2,4);
+        }
+        else
+        {
+          String[] names = {"BowtieTesselation2x4-0x0.png"};
+          int rndIndex = (int)(random(names.length));
+          tile = new PNGGridTile(new int[]{x,y}, new int[]{2,4}, new float[]{0,0},names[rndIndex] );
+        }
+      
+    }
+    else if(w==2 && h==3)
+    {
+        if(random(1) > .5)
+        {
+          tile = new StaticProceduralTile(x,y,2,3);
+        }
+        else
+        {
+          String[] names = {"BowtieTesselation2x3-0x0.png"};
+          int rndIndex = (int)(random(names.length));
+          tile = new PNGGridTile(new int[]{x,y}, new int[]{2,3}, new float[]{0,0},names[rndIndex] );
+        }
     }
     else if(w==2 && h ==2)
     {
@@ -121,7 +238,7 @@ class GridTiler implements XMLLoadable
         }
         else
         {
-          String[] names = {"metal2x2-0x50 copy.png","grass2x2-0x50.png","hair2x2-0x50.png"};
+          String[] names = {"arrays2x2-0x0.png", "flowers2x2-0x0.png", "LeftBigFan2x2-0x0.png"};
           int rndIndex = (int)(random(names.length));
           tile = new PNGGridTile(new int[]{x,y}, new int[]{2,2}, new float[]{0,50},names[rndIndex] );
         }
@@ -129,9 +246,48 @@ class GridTiler implements XMLLoadable
     }
     else if(w==2 && h == 1)
     {
-          String[] names = {"text2x1-0x25.png"};
+          String[] names = {"BowtieTesselation2x1-0x0.png"};
           int rndIndex = (int)(random(names.length));
-          tile = new PNGGridTile(new int[]{x,y}, new int[]{2,1}, new float[]{0,75},names[rndIndex] );
+          tile = new PNGGridTile(new int[]{x,y}, new int[]{2,1}, new float[]{0,0},names[rndIndex] );
+    }
+    else if(w==1 && h==4)
+    {
+        if(random(1) > .5)
+        {
+          tile = new StaticProceduralTile(x,y,1,4);
+        }
+        else
+        {
+          String[] names = {"InterlockingCircles1x4-0x0.png"};
+          int rndIndex = (int)(random(names.length));
+          tile = new PNGGridTile(new int[]{x,y}, new int[]{1,4}, new float[]{0,0},names[rndIndex] );
+        }
+    }
+    else if(w==1 && h==3)
+    {
+        if(random(1) > .5)
+        {
+          tile = new StaticProceduralTile(x,y,1,3);
+        }
+        else
+        {
+          String[] names = {"BowtieTesselation1x3-0x0.png"};
+          int rndIndex = (int)(random(names.length));
+          tile = new PNGGridTile(new int[]{x,y}, new int[]{1,3}, new float[]{0,0},names[rndIndex] );
+        }
+    }
+    else if(w==1 && h==2)
+    {
+        if(random(1) > .5)
+        {
+          tile = new StaticProceduralTile(x,y,1,2);
+        }
+        else
+        {
+          String[] names = {"LeftBigFan1x2-0x0.png"};
+          int rndIndex = (int)(random(names.length));
+          tile = new PNGGridTile(new int[]{x,y}, new int[]{1,2}, new float[]{0,0},names[rndIndex] );
+        }
     }
     else if(w==1 && h ==1)
     {
@@ -141,9 +297,9 @@ class GridTiler implements XMLLoadable
         }
         else
         {
-          String[] names = {"pants1x1-0x25.png","corn1x1-0x25.png"};
+          String[] names = {"arrays1x1-0x0.png", "flowers1x1-0x0.png", "LeftSmallFan1x1-0x0.png"};
           int rndIndex = (int)(random(names.length));
-          tile = new PNGGridTile(new int[]{x,y}, new int[]{1,1}, new float[]{0,25},names[rndIndex] );
+          tile = new PNGGridTile(new int[]{x,y}, new int[]{1,1}, new float[]{0,0},names[rndIndex] );
         }
     }
     addTile(genTiles,tile);
@@ -201,29 +357,30 @@ class GridTiler implements XMLLoadable
   //***************************************************************
   void draw()
   {
-    pushMatrix();
-    translate(origin[0],origin[1]);
-//    background(255,0,0);
-    for(BaseGridTile tile : xmlTiles)
-    {
-      pushMatrix();
-      translate(tile.position[0]*xAxis[0] + tile.position[1]*yAxis[0], 
-                tile.position[0]*xAxis[1] + tile.position[1]*yAxis[1]);
-      tile.draw();
-//println("tile.position: " + tile.position[0] + ", " + tile.position[1]);
-      popMatrix();
-    }
+    dg.pushMatrix();
+    dg.translate(origin[0],origin[1]);
+//    dg.background(255,0,0);
     
     for(BaseGridTile tile : genTiles)
     {
-      pushMatrix();
-      translate(tile.position[0]*xAxis[0] + tile.position[1]*yAxis[0], 
-                tile.position[0]*xAxis[1] + tile.position[1]*yAxis[1]);
+      dg.pushMatrix();
+      dg.translate(tile.position[0]*xAxis[0] + tile.position[1]*yAxis[0], 
+                   tile.position[0]*xAxis[1] + tile.position[1]*yAxis[1]);
       tile.draw();
 //println("tile.position: " + tile.position[0] + ", " + tile.position[1]);
-      popMatrix();
+      dg.popMatrix();
     }
-    popMatrix();
+
+    for(BaseGridTile tile : xmlTiles)
+    {
+      dg.pushMatrix();
+      dg.translate(tile.position[0]*xAxis[0] + tile.position[1]*yAxis[0], 
+                   tile.position[0]*xAxis[1] + tile.position[1]*yAxis[1]);
+      tile.draw();
+//println("tile.position: " + tile.position[0] + ", " + tile.position[1]);
+      dg.popMatrix();
+    }
+    dg.popMatrix();
   }
  
 
@@ -288,8 +445,8 @@ class GridTiler implements XMLLoadable
       {  tile = new StaticProceduralTile(currentTileXML); }
       else if(className == "AnimatedGridTile")
       {  tile = new AnimatedGridTile(currentTileXML); }
-      else if(className == "RiverTile")
-      {  tile = new RiverTile(currentTileXML,xAxis,yAxis); }
+      else if(className == "SkyTile")
+      {  tile = new SkyTile(currentTileXML); }
       else if (className == "#text")
       { /*do nothing empty whitespace nodes.*/}
       else
