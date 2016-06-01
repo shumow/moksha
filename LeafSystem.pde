@@ -9,23 +9,23 @@ static final int min_leaf_spawn_pts = 200;
 
 static final boolean leafs_fall = false;
 
-class LeafSystem {
-
-  class Point {    
-    float x;
-    float y;
-    
-    Point(float ix, float iy) {
-      x = ix;
-      y = iy;
-    }
-    
-    Point(Point o) {
-      x = o.x;
-      y = o.y;
-    }
+class Point {    
+  float x;
+  float y;
+  
+  Point(float ix, float iy) {
+    x = ix;
+    y = iy;
   }
   
+  Point(Point o) {
+    x = o.x;
+    y = o.y;
+  }
+}
+
+class LeafSystem {
+ 
   class Leaf {
     Point pt;
     

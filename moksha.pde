@@ -2,9 +2,8 @@
 //moksha app
 // fork of falling leaves app
 //***************************************************************
-final boolean DEBUG_MODE = true;
+final boolean DEBUG_MODE = false;
 final boolean ROTATE_DISPLAY = false;
-final boolean HALVE_DISPLAY = false;
 static boolean display_tree = false;
 static boolean display_silhouette = true;
 static PImage imgTree = null;
@@ -25,7 +24,14 @@ static float cropX;
 static int screenWidth = 960;
 static int screenHeight = 540;
 
+/*
+static int screenWidth = 1920;
+static int screenHeight = 1080;  
+*/
+
 static LeafSystem leafs;
+
+static CottonwoodSeedSystem seeds;
 
 RadialTileChanger tileChanger;
 
@@ -62,6 +68,8 @@ void setup()
   
   tileChanger = new RadialTileChanger(gridTiles,new float[]{0,0});
   CreateLeafSystem();
+  
+  seeds = new CottonwoodSeedSystem();
   
   imgTree = loadImage("treeoverlay.png");
   imgSilhouette = loadImage("treesilhouette.png");
@@ -129,6 +137,7 @@ void draw()
   float secondsSinceLastUpdate = (millis()-lastEndTick)/1000.f;
   gridTiles.update(secondsSinceLastUpdate);
   leafs.update(secondsSinceLastUpdate);
+  seeds.update(secondsSinceLastUpdate);
   tileChanger.update(secondsSinceLastUpdate);
   gridTiles.draw();
   lastEndTick = millis();
@@ -160,6 +169,8 @@ void draw()
       dg.line(cropX,0,cropX,height);
     dg.popStyle();
   }
+  
+  seeds.draw();
   
   //dg.endDraw();
   //clear();
