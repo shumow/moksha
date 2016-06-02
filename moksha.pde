@@ -4,6 +4,7 @@
 //***************************************************************
 final boolean DEBUG_MODE = false;
 final boolean ROTATE_DISPLAY = false;
+final boolean PAINT_MODE = true;
 static boolean display_tree = false;
 static boolean display_silhouette = true;
 static PImage imgTree = null;
@@ -21,13 +22,18 @@ static boolean draw_crop_line = false;
 
 static float cropX;
 
+/*
 static int screenWidth = 960;
 static int screenHeight = 540;
+*/
 
 /*
 static int screenWidth = 1920;
-static int screenHeight = 1080;  
+static int screenHeight = 1080;
 */
+
+static int screenWidth = 1280;
+static int screenHeight = 720;
 
 static LeafSystem leafs;
 
@@ -55,7 +61,12 @@ void setup()
   {
     size(screenHeight,screenWidth,P2D);
   }
-
+  
+  if (PAINT_MODE)
+  {
+    display_leaves = false;
+  }
+  
   dg = g;
   
   XML xml = loadXML("GridTiler.xml");
@@ -76,6 +87,8 @@ void setup()
   
   println("classname: " + super.getClass().getSuperclass());
 //  fmr = new FluidMotionReceiver(this,"videoFluidSyphon");
+
+  noCursor();
 }
 
 void drawTree()
@@ -123,7 +136,16 @@ void draw()
 {
   //dg.beginDraw();
   dg.pushStyle();
-  dg.fill(0,0,0,90);
+
+  if (PAINT_MODE)
+  {
+    dg.fill(128,128,128,90);
+  }
+  else
+  {
+    dg.fill(0,0,0,90);    
+  }
+
   dg.rect(0,0,width,height);
   dg.popStyle();
   
@@ -135,11 +157,21 @@ void draw()
   }
 
   float secondsSinceLastUpdate = (millis()-lastEndTick)/1000.f;
-  gridTiles.update(secondsSinceLastUpdate);
+
+  if (PAINT_MODE)
+  {
+    gridTiles.update(secondsSinceLastUpdate);
+  }
+  
   leafs.update(secondsSinceLastUpdate);
   seeds.update(secondsSinceLastUpdate);
   tileChanger.update(secondsSinceLastUpdate);
-  gridTiles.draw();
+  
+  if (!PAINT_MODE)
+  {
+    gridTiles.draw();
+  }
+  
   lastEndTick = millis();
   
   if (display_tree) {

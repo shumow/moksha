@@ -119,7 +119,12 @@ class LeafSystem {
       pg.translate(0,width);
       pg.rotate(-PI/2);
     } 
-   
+    
+    if ((pg.width != img.width) ||
+        (pg.height != img.height))
+    {
+      img.resize(pg.width, pg.height);
+    }
     pg.background(img); 
     pg.popMatrix();
   }
