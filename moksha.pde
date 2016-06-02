@@ -4,7 +4,7 @@
 //***************************************************************
 final boolean DEBUG_MODE = false;
 final boolean ROTATE_DISPLAY = false;
-final boolean PAINT_MODE = true;
+final boolean PAINT_MODE = false;
 static boolean display_tree = false;
 static boolean display_silhouette = true;
 static PImage imgTree = null;
@@ -158,7 +158,7 @@ void draw()
 
   float secondsSinceLastUpdate = (millis()-lastEndTick)/1000.f;
 
-  if (PAINT_MODE)
+  if (!PAINT_MODE)
   {
     gridTiles.update(secondsSinceLastUpdate);
   }
