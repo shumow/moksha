@@ -3,6 +3,7 @@
     <xAxis x="0" y="-1" />
     <yAxis x="-0.8660254" y="-0.5" />
     <origin x="360" y="640" />
+    <dimensions xmin="-25" xmax="25" ymin="-12" ymax="12"/>
     <Tiles>
         <SkyTile x="-20" y="-1" />
         <SkyTile x="-19" y="-1" />

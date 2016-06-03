@@ -1,24 +1,57 @@
 import java.util.Hashtable;
 boolean populate_tiles = true;
 
+class GridPos 
+{
+  int x;
+  int y;
+  
+  GridPos()
+  {
+    x = y = MAX_INT;
+  }
+  
+  GridPos(int ix, int iy)
+  {
+    x = ix;
+    y = iy;
+  }
+
+  @Override public boolean equals(Object o)
+  {
+    return (o instanceof GridPos) && ((((GridPos) o).x == this.x) && (((GridPos) o).y == this.y));
+  }
+  
+  @Override public int hashCode()
+  {
+    // Right now I'm just using a hypothetical max dimension of 2^(2^4) + 1 (Fermat-4)
+    // a better solution would be to make the GridPos aware of the actual dimensions of
+    // the grid that we are using.
+    int R = (1 << 16) + 1;
+    
+    return ((x + R) + 2*R*(y+R));
+  }
+}
+
+
 //***************************************************************
 // grid responsible for managing, drawingm and updating all of the
 // animated an non animated tiles
 //***************************************************************
 class GridTiler implements XMLLoadable
-{
-
-  
+{  
   protected float[] xAxis = {39,25};
   protected float[] yAxis = {25,39};
   protected float[] origin = {0,0};
+  protected int[] xdim = {0,0};
+  protected int[] ydim = {0,0};
   
-  ArrayList<BaseGridTile> xmlTiles = new ArrayList<BaseGridTile>();
-  ArrayList<BaseGridTile> genTiles = new ArrayList<BaseGridTile>();
+  //ArrayList<BaseGridTile> xmlTiles = new ArrayList<BaseGridTile>();
+  //ArrayList<BaseGridTile> genTiles = new ArrayList<BaseGridTile>();
   //  table of tiles that come from xml
-  //  Hashtable<pos,BaseGridTile> xmlTiles = new Hashtable<pos,BaseGridTile>();
+  Hashtable<GridPos,BaseGridTile> xmlTiles = new Hashtable<GridPos,BaseGridTile>();
   //table of tile that we generate ourselves
-  //  Hashtable<pos,BaseGridTile> genTiles = new Hashtable<pos,BaseGridTile>();
+  Hashtable<GridPos,BaseGridTile> genTiles = new Hashtable<GridPos,BaseGridTile>();
   //***************************************************************
   // xml - xml object containing serialized object
   //***************************************************************
@@ -309,33 +342,37 @@ class GridTiler implements XMLLoadable
   boolean isTileOccupied(int x, int y, int w, int h)
   {
     boolean occupied = false;
-    for(BaseGridTile tile : xmlTiles) 
+
+    for(int i = 0; i < w; i++)
     {
-      for(int i = 0; i < w; i++)
+      for(int j = 0; j < h; j++)
       {
-        for(int j = 0; j < h; j++)
+        BaseGridTile tile = xmlTiles.get(new GridPos(x+i,y+j));
+        if (null != tile)
         {
           occupied = occupied || ((tile.position[0] == x+i) && (tile.position[1] == y+j));
         }
-      }  
-    }
+      }
+    }  
     
-    for(BaseGridTile tile : genTiles) 
+    for(int i = 0; i < w; i++)
     {
-      for(int i = 0; i < w; i++)
+      for(int j = 0; j < h; j++)
       {
-        for(int j = 0; j < h; j++)
+        BaseGridTile tile = genTiles.get(new GridPos(x+i,y+j));
+        if (null != tile)
         {
           occupied = occupied || ((tile.position[0] == x+i) && (tile.position[1] == y+j));
         }
-      }  
-    }
+      }
+    }  
+
     return occupied;
   }
 
-  ArrayList<BaseGridTile> getGenTiles()
+  Hashtable<GridPos, BaseGridTile> getGenTiles()
   {
-    return new ArrayList<BaseGridTile>(genTiles);
+    return new Hashtable<GridPos, BaseGridTile>(genTiles);
   }
 
   //***************************************************************
@@ -343,11 +380,11 @@ class GridTiler implements XMLLoadable
   //***************************************************************
   void update(float dt)
   { 
-    for(BaseGridTile tile : xmlTiles)
+    for(BaseGridTile tile : xmlTiles.values())
     {
       tile.update(dt);
     }
-    for(BaseGridTile tile : genTiles)
+    for(BaseGridTile tile : genTiles.values())
     {
       tile.update(dt);
     }
@@ -362,7 +399,7 @@ class GridTiler implements XMLLoadable
     dg.translate(origin[0],origin[1]);
 //    dg.background(255,0,0);
     
-    for(BaseGridTile tile : genTiles)
+    for(BaseGridTile tile : genTiles.values())
     {
       dg.pushMatrix();
       dg.translate(tile.position[0]*xAxis[0] + tile.position[1]*yAxis[0], 
@@ -372,7 +409,7 @@ class GridTiler implements XMLLoadable
       dg.popMatrix();
     }
 
-    for(BaseGridTile tile : xmlTiles)
+    for(BaseGridTile tile : xmlTiles.values())
     {
       dg.pushMatrix();
       dg.translate(tile.position[0]*xAxis[0] + tile.position[1]*yAxis[0], 
@@ -424,6 +461,14 @@ class GridTiler implements XMLLoadable
     origin[1] = originElem.getFloat("y");
     println("origin: " + origin[0] + ", " + origin[1]);
     
+    XML dimensionsElemen = xml.getChild("dimensions");
+    xdim[0] = dimensionsElemen.getInt("xmin");
+    xdim[1] = dimensionsElemen.getInt("xmax");
+    println("x-dimensions: " + xdim[0] + "-" + xdim[1]);
+    ydim[0] = dimensionsElemen.getInt("ymin");
+    ydim[1] = dimensionsElemen.getInt("ymax");
+    println("y-dimensions: " + ydim[0] + "-" + ydim[1]);
+    
     //create babies!!!
     XML tileXML = xml.getChild("Tiles");
     XML[] tileElems = tileXML.getChildren();
@@ -457,43 +502,51 @@ class GridTiler implements XMLLoadable
       }
       if(tile != null)
       {
-//          tiles.add(new pos(tile.position[0],tile.position[0]),tile);
-//         xmlTiles.add(tile);
          addTile(xmlTiles,tile);
       }
     }
   }
   
-  void addTile(ArrayList<BaseGridTile> list, BaseGridTile tile)
+  void addTile(Hashtable<GridPos, BaseGridTile> list, BaseGridTile tile)
   {
-    for(BaseGridTile t : genTiles) 
+    GridPos p = new GridPos(tile.position[0], tile.position[1]);
+    
+    if (null != genTiles.get(p))
     {
-      if(t.position[0] == tile.position[0] && t.position[1] == tile.position[1])
-        return;
+      return;
     }   
-    list.add(tile);
+    list.put(p, tile);
     for(BaseGridTile t : tile.subTiles)
     {
-      list.add(t);
+      GridPos sp = new GridPos(t.position[0], t.position[1]);      
+      list.put(sp, t);
     }
   }
   
   void removeTileAt( int x, int y)
   {
-    for(BaseGridTile tile : genTiles) 
+    GridPos p = new GridPos(x,y);
+    
+    BaseGridTile tile = genTiles.get(p);
+    
+    if ((null != tile) && (tile.position[0] == x && tile.position[1] == y))
     {
-      if(tile.position[0] == x && tile.position[1] == y )
-      {
-        removeTile(genTiles, tile);
-        return;
-      }
+      removeTile(genTiles, tile);
+      return;
     }
   }
   
   //removes a tile from the grid and its children and its parent
-  void removeTile(ArrayList<BaseGridTile> list, BaseGridTile tile)
+  void removeTile(Hashtable<GridPos, BaseGridTile> list, BaseGridTile tile)
   {
-    if(list.remove(tile))
+    if (null == tile)
+    {
+      return;
+    }
+
+    GridPos p = tile.getPosition();
+    
+    if(tile == list.remove(p))  // could be a bug if we ever have multiple tiles loaded at the same position
     {
       removeTile(list,tile.parentTile);
       tile.parentTile = null;
